@@ -1,6 +1,8 @@
 package com.quiz.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.aot.nativex.NativeConfigurationWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.quiz.Dao.QuestionDao;
 import com.quiz.Dao.QuizDao;
 import com.quiz.Entities.Question;
+import com.quiz.Entities.QuestionWrapper;
 import com.quiz.Entities.Quiz;
 
 @Service
@@ -32,4 +35,18 @@ public class QuizService {
 		quizDao.save(quiz);
 		return new ResponseEntity<> ("Success",HttpStatus.CREATED);
 	}
+	
+	public ResponseEntity<List<QuestionWrapper>> getQuizQuestions(Integer id)
+	{
+		Optional<Quiz> quiz = quizDao.findById(id);
+		List<Question> questionfromdb = quiz.get().getQuestions();
+		List<QuestionWrapper> questionforUser = new ArrayList<>();
+		for (Question q : questionfromdb)
+		{
+			QuestionWrapper questionWrapper = new QuestionWrapper(q.getId(),q.getQuestionTitle(),q.getOption1(),q.getOption2(),q.getOption3(),q.getOption4());
+			questionforUser.add(questionWrapper);
+		}
+		
+		return new ResponseEntity<>(questionforUser,HttpStatus.OK);
+ 	}
 }
